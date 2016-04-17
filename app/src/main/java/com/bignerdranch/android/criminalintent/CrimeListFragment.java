@@ -1,6 +1,8 @@
 package com.bignerdranch.android.criminalintent;
 
+import android.app.Activity;
 import android.app.ListFragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,6 +13,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 /**
  * Created by leon on 3/14/16.
@@ -18,6 +21,7 @@ import java.util.ArrayList;
 public class CrimeListFragment extends ListFragment {
     private ArrayList<Crime> mCrimes;
     private static final String TAG = "CrimeListFragment";
+    private int REQUEST_CRIME = 1;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +32,11 @@ public class CrimeListFragment extends ListFragment {
         setListAdapter(adapter);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((CrimeAdapter)getListAdapter()).notifyDataSetChanged();
+    }
     private class CrimeAdapter extends ArrayAdapter<Crime> {
         public CrimeAdapter(ArrayList<Crime> crimes) {
             super(getActivity(), 0, crimes);
@@ -56,12 +65,23 @@ public class CrimeListFragment extends ListFragment {
 
             return convertView;
         }
-
     }
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         Crime c = (Crime)(getListAdapter().getItem(position));
         Log.d(TAG, c.getTitle() + " was clicked");
+        Intent intent = new Intent(getActivity(), CrimeActivity.class);
+        intent.putExtra(CrimeFragment.EXTRA_CRIME_ID, c.getId());
+        startActivityForResult(intent, REQUEST_CRIME);
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == REQUEST_CRIME) {
+            //Handle result
+            Log.d(TAG, "onActivityResult");
+        }
+    }
+
 
 }
